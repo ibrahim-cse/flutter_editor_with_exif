@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_editor/screens/camera_form.dart';
+import 'package:flutter_editor/screens/home_page.dart';
 
 void main() {
   runApp(MyApp());
@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MyCamera(),
+      home: HomePage(),
     );
   }
 }

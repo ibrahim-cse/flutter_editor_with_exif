@@ -1,25 +1,24 @@
-// ignore_for_file: deprecated_member_use
-
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_editor/screens/test_editor.dart';
-import 'package:flutter_editor/util/exif.dart';
-import 'package:flutter_editor/util/watermark.dart';
+import 'package:flutter_editor/capture2edit/screens/slideshow.dart';
 import 'package:image_picker/image_picker.dart';
 
-class MyCamera extends StatefulWidget {
+import '../common/logout_promt.dart';
+import 'editor.dart';
+
+class LandingForm extends StatefulWidget {
   @override
-  _MyCameraState createState() => _MyCameraState();
+  _LandingFormState createState() => _LandingFormState();
 }
 
-class _MyCameraState extends State<MyCamera> {
+class _LandingFormState extends State<LandingForm> {
   String dirPath = '';
   File? imageFile;
 
   _initialImageView() {
     if (imageFile == null) {
-      return const Text(
+      return Text(
         'No Image Selected...',
         style: TextStyle(fontSize: 20.0),
       );
@@ -38,19 +37,6 @@ class _MyCameraState extends State<MyCamera> {
     });
   }
 
-  // void getImage(ImageSource imageSource) async {
-  //   PickedFile? imageFile =
-  //       await ImagePicker().getImage(source: ImageSource.camera);
-  //   if (imageFile == null) return;
-  //   File tmpFile = File(imageFile.path);
-  //   final appDir = await getApplicationDocumentsDirectory();
-  //   final fileName = Basename(imageFile.path);
-  //   localFile = await tmpFile.copy('${appDir.path}/$fileName');
-  //   setState(() {
-  //     _image = localFile;
-  //   });
-  // }
-
   _openCamera(BuildContext context) async {
     var picture = await ImagePicker().pickImage(source: ImageSource.camera);
     setState(() {
@@ -62,21 +48,6 @@ class _MyCameraState extends State<MyCamera> {
     });
   }
 
-//   _saveImage() async {
-//     final image = await ImagePicker().pickImage(source: ImageSource.camera);
-//
-// // getting a directory path for saving
-//     var path;
-//     path = await getExternalStorageDirectory().path;
-//
-// // copy the file to a new path
-//     final File newImage = await image!.copy('$path/image1.png');
-//
-//     setState(() {
-//       _image = newImage;
-//     });
-//   }
-
   Future<void> _showChoiceDialog(BuildContext context) {
     return showDialog(
         context: context,
@@ -87,15 +58,15 @@ class _MyCameraState extends State<MyCamera> {
               child: ListBody(
                 children: [
                   GestureDetector(
-                    child: const Text('Gallery'),
+                    child: Text('Gallery'),
                     onTap: () {
                       _openGallery(context);
                       Navigator.of(context).pop();
                     },
                   ),
-                  const Padding(padding: EdgeInsets.all(8.0)),
+                  Padding(padding: EdgeInsets.all(8.0)),
                   GestureDetector(
-                    child: const Text('Camera'),
+                    child: Text('Camera'),
                     onTap: () {
                       _openCamera(context);
                       Navigator.of(context).pop();
@@ -108,44 +79,20 @@ class _MyCameraState extends State<MyCamera> {
         });
   }
 
-  Future<void> _showMetaDialog() {
-    return showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Image Metadata'),
-            content: SingleChildScrollView(
-              child: ListBody(
-                children: [
-                  GestureDetector(
-                    child: const Text('Tap here to see metadata!'),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ExifPackage(),
-                        ),
-                      );
-                    },
-                  ),
-                  const Padding(padding: EdgeInsets.all(8.0)),
-                ],
-              ),
-            ),
-          );
-        });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('View Image'),
+        title: Text('View Image'),
         actions: [
-          ElevatedButton.icon(
-            onPressed: _showMetaDialog,
-            icon: Icon(Icons.info_outline_rounded),
-            label: Text(''),
+          FlatButton(
+            onPressed: () {
+              logoutChoiceDialog(context);
+            },
+            child: Icon(
+              Icons.logout,
+              color: Colors.white,
+            ),
           ),
         ],
       ),
@@ -173,7 +120,30 @@ class _MyCameraState extends State<MyCamera> {
                     borderRadius: BorderRadius.circular(30.0),
                   ),
                 ),
-                const SizedBox(
+                SizedBox(
+                  height: 15.0,
+                ),
+                Container(
+                  margin: EdgeInsets.symmetric(horizontal: 30.0),
+                  width: 250.0,
+                  child: FlatButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => Slideshow()),
+                      );
+                    },
+                    child: Text(
+                      'Slideshow',
+                      style: TextStyle(color: Colors.white, fontSize: 16.0),
+                    ),
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.blue,
+                    borderRadius: BorderRadius.circular(30.0),
+                  ),
+                ),
+                SizedBox(
                   height: 15.0,
                 ),
                 Container(
@@ -188,7 +158,7 @@ class _MyCameraState extends State<MyCamera> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => FlutterPainterExample(
+                          builder: (context) => MyImagePainter(
                             filePath: dirPath,
                           ),
                         ),
@@ -200,57 +170,7 @@ class _MyCameraState extends State<MyCamera> {
                     borderRadius: BorderRadius.circular(30.0),
                   ),
                 ),
-                const SizedBox(
-                  height: 15.0,
-                ),
-                Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 30.0),
-                  width: 250.0,
-                  child: FlatButton(
-                    child: const Text(
-                      'Watermark',
-                      style: TextStyle(color: Colors.white, fontSize: 16.0),
-                    ),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => WaterMark(),
-                        ),
-                      );
-                    },
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.blue,
-                    borderRadius: BorderRadius.circular(30.0),
-                  ),
-                ),
-                const SizedBox(
-                  height: 15.0,
-                ),
-                Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 30.0),
-                  width: 250.0,
-                  child: FlatButton(
-                    child: const Text(
-                      'Exif',
-                      style: TextStyle(color: Colors.white, fontSize: 16.0),
-                    ),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ExifPackage(),
-                        ),
-                      );
-                    },
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.blue,
-                    borderRadius: BorderRadius.circular(30.0),
-                  ),
-                ),
-                const SizedBox(
+                SizedBox(
                   height: 15.0,
                 ),
               ],
